@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin Shop</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--bg:#030305;--panel:#0e121b;--cy:#00f0ff;--pu:#7b6cf6;--rd:#ff2a2a;--tx:#e8eef7;--mu:#8b97a8;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background-color:#000;background-image:radial-gradient(900px 400px at 50% -10%,rgba(0,240,255,.18) 0,transparent 70%);transition:background-color .8s;color:var(--tx);font-family:"Segoe UI",Roboto,system-ui,sans-serif;min-height:100vh}
+body.blu{background-color:#0a35c8}
+/* Security screen */
+#sec{position:fixed;inset:0;z-index:100;background:#000;display:flex;align-items:center;justify-content:center;padding:20px;transition:opacity .5s}
+#sec.out{opacity:0;pointer-events:none}
+.sbox{width:100%;max-width:420px;background:#0d111a;border:1px solid #1d222d;border-radius:34px;padding:42px 26px 40px;text-align:center;box-shadow:0 0 90px rgba(0,255,180,.07)}
+.sbox h1{color:var(--cy);font-size:28px;letter-spacing:5px;line-height:1.5;font-weight:800}
+.spin{width:72px;height:72px;margin:34px auto;border-radius:50%;border:5px solid #0f2a31;border-right-color:var(--cy);animation:r 1s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+.stxt{font-family:ui-monospace,Menlo,Consolas,monospace;color:#8a8f98;font-size:15px;letter-spacing:2px;margin-bottom:20px}
+.bar{height:7px;border-radius:9px;background:#1b1e24;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--cy);border-radius:9px;transition:width .2s}
+/* Header */
+.wrap{max-width:460px;margin:0 auto;padding:10px 3% 90px}
+.top{display:flex;align-items:center;gap:8px;background:#0b0e15;border:1px solid #232a38;border-radius:16px;padding:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:30}
+.ib{width:38px;height:38px;border-radius:10px;border:1.5px solid var(--cy);background:transparent;color:var(--cy);font-size:17px;display:grid;place-items:center;flex:none;cursor:pointer}
+.dep{flex:1;max-width:230px;height:38px;border-radius:10px;border:1.5px solid var(--rd);background:#c40d0d;color:#fff;font-weight:800;font-size:12px;box-shadow:0 0 14px rgba(255,0,0,.4);cursor:pointer}
+.logo{width:40px;height:40px;border-radius:50%;border:2px solid var(--cy);box-shadow:0 0 12px var(--cy);display:grid;place-items:center;font-size:7px;color:var(--cy);text-align:center;line-height:1.1;font-weight:700;margin-left:auto;flex:none}
+.h2{color:var(--cy);font-weight:800;letter-spacing:2px;font-size:13px;margin:14px 2px 8px}
+.bal{--lc:#00f0ff;display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:9px 12px;border-radius:12px;background:#0b0e15;border:1.5px solid var(--lc);box-shadow:0 0 14px var(--lc);transition:border-color .8s,box-shadow .8s}
+.bal span{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--lc);transition:color .8s}
+.bal b{font-size:15px;color:#fff}
+.tools{display:flex;gap:6px;align-items:center;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+.tools::-webkit-scrollbar{display:none}
+#q{flex:1 0 140px;height:32px;border-radius:9px;border:1px solid #2a3344;background:#0b0e15;color:var(--tx);padding:0 10px;font-size:12px;outline:none}
+#q:focus{border-color:var(--cy)}
+.chip{flex:none;height:32px;padding:0 11px;border-radius:9px;border:1px solid #2a3344;background:#0b0e15;color:var(--mu);font-size:11px;font-weight:700;cursor:pointer}
+.chip.on{border-color:var(--cy);color:var(--cy);box-shadow:0 0 8px rgba(0,240,255,.3)}
+/* Cards */
+.grid{display:flex;flex-direction:column;gap:12px;padding:0 1%}
+.card{background:var(--panel);border:1.5px solid #2f6bff;border-radius:12px;overflow:hidden;box-shadow:0 0 10px rgba(47,107,255,.55),inset 0 0 8px rgba(47,107,255,.15);display:flex;flex-direction:column}
+.th{position:relative;aspect-ratio:16/9.5;cursor:pointer;overflow:hidden}
+.tag{position:absolute;top:6px;font-size:9px;font-weight:800;padding:2px 5px;border-radius:5px;color:#fff;background:rgba(0,150,160,.75);border:1px solid var(--cy)}
+.tag.l{left:5px}.tag.r{right:5px;background:rgba(95,80,200,.8);border-color:var(--pu)}
+.play{position:absolute;inset:0;margin:auto;width:40px;height:40px;border-radius:50%;border:2px solid var(--cy);background:rgba(0,0,0,.35);display:grid;place-items:center;color:#fff;font-size:12px;box-shadow:0 0 10px var(--cy)}
+.hud{position:absolute;left:6px;bottom:6px;right:6px;display:flex;justify-content:space-between;font-size:8px;color:#ffffffcc}
+.body{padding:8px 7px 8px;display:flex;flex-direction:column;gap:6px}
+.nm{font-size:14px;font-weight:800;text-align:center;text-transform:uppercase;line-height:1.2}
+.ft{display:flex;align-items:center;gap:5px;background:#0a0e17;border-left:2px solid var(--cy);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:600}
+.ft b{font-size:9px}
+.more{display:none;flex-direction:column;gap:6px}.more.open{display:flex}
+.chev{background:none;border:0;color:var(--tx);font-size:13px;cursor:pointer;line-height:1;transition:transform .2s}
+.chev.open{transform:rotate(180deg)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.b{height:31px;border-radius:8px;background:transparent;font-size:9px;font-weight:800;line-height:1.1;cursor:pointer;color:var(--tx);padding:0 3px}
+.b.c{border:1.5px solid var(--cy)}.b.r{border:1.5px solid var(--rd)}
+.b{display:flex;align-items:center;justify-content:center;gap:4px}.b svg{width:13px;height:13px;flex:none}
+.buy{height:34px;border:0;border-radius:9px;background:linear-gradient(90deg,#6f7ff0,#8a4fb8);color:#fff;font-weight:800;font-size:12px;cursor:pointer}
+.none{grid-column:1/-1;text-align:center;color:var(--mu);padding:30px 0;font-size:13px}
+.plans{display:none;flex-direction:column;gap:7px;margin-top:4px}
+.plans.open{display:flex}
+.about{margin:18px 1% 0;background:#0e121b;border:1.5px solid var(--pu);border-radius:16px;padding:16px 14px;box-shadow:0 0 14px rgba(123,108,246,.35)}
+.about h3{color:var(--cy);font-size:14px;letter-spacing:2px;margin-bottom:8px}
+.about p{font-size:12.5px;line-height:1.55;color:#cfd6e4;margin-bottom:10px}
+.about ul{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.about li{font-size:12px;line-height:1.45;color:#cfd6e4;padding-left:20px;position:relative}
+.about li::before{content:"⚡";position:absolute;left:0;top:0}
+.ft2{text-align:center;color:var(--cy);font-weight:800;letter-spacing:2px;font-size:12px;border-top:1px solid #23232c;padding-top:12px}
+.ft2 small{display:block;color:var(--mu);font-weight:600;letter-spacing:1px;font-size:10px;margin-top:4px}
+.pl{display:flex;align-items:center;gap:8px;background:#141419;border:1px solid #23232c;border-radius:12px;padding:8px 10px}
+.pl>div:first-child{flex:1;min-width:0}
+.pd{color:var(--cy);font-weight:800;font-size:12px}
+.pp{font-weight:800;font-size:15px;margin-top:2px}
+.qt{width:46px;height:36px;border-radius:9px;border:1.5px solid #34343f;background:#20202a;color:var(--tx);text-align:center;font-size:14px;outline:none;-moz-appearance:textfield}
+.qt::-webkit-inner-spin-button,.qt::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.qt:focus{border-color:var(--cy)}
+.bx{height:32px;padding:0 15px;border:0;border-radius:8px;background:linear-gradient(90deg,#b44fe0,#ec4899);color:#fff;font-weight:800;font-size:12px;cursor:pointer}
+/* Telegram + modal */
+.tg{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));width:50px;height:50px;border-radius:50%;background:#1d9bd8;display:grid;place-items:center;box-shadow:0 4px 16px rgba(0,0,0,.5);z-index:20;text-decoration:none}
+.tg svg{width:26px;height:26px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linejoin:round}
+#m{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:16px}
+#m.show{display:flex}
+.mb{max-height:92vh;overflow:auto;width:100%;max-width:320px;background:var(--panel);border:1.5px solid var(--cy);border-radius:16px;padding:16px;text-align:center;box-shadow:0 0 24px rgba(0,240,255,.25)}
+.mb h3{font-size:14px;margin-bottom:10px}
+.qr{width:150px;height:150px;margin:0 auto 10px;background:#fff;border-radius:10px;display:grid;place-items:center;color:#111;font-size:11px;font-weight:700;overflow:hidden}
+.qr img{width:100%;height:100%;object-fit:contain}
+.upi{display:flex;gap:6px;align-items:center;background:#0a0e17;border:1px solid #2a3344;border-radius:9px;padding:8px 10px;font-size:12px;margin-bottom:10px;word-break:break-all}
+.upi button{margin-left:auto;flex:none;background:var(--cy);color:#000;border:0;border-radius:6px;font-weight:800;font-size:10px;padding:5px 8px;cursor:pointer}
+.mb p{font-size:10.5px;color:var(--mu);margin-bottom:10px;line-height:1.4}
+.mb a,.mb .x{display:block;height:34px;line-height:34px;border-radius:9px;font-weight:800;font-size:12px;text-decoration:none;margin-top:6px;cursor:pointer;border:0;width:100%}
+.mb a{background:#1d9bd8;color:#fff}.mb .x{background:#1b2230;color:var(--tx)}
+</style>
+</head>
+<body>
+
+<div id="sec">
+  <div class="sbox">
+    <h1>SECURITY<br>VALIDATION</h1>
+    <div class="spin"></div>
+    <div class="stxt" id="st">Initializing secure link...</div>
+    <div class="bar"><i id="pb"></i></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="top">
+    <button class="ib" aria-label="Menu">&#9776;</button>
+    <button class="dep" onclick="openM('Deposit karne ke liye neeche UPI par payment karein aur screenshot Telegram par bhejein.')">&#9654; HOW TO DEPOSIT?</button>
+    <button class="ib" aria-label="Theme">&#127912;</button>
+    <div class="logo">ADMIN<br>PANEL</div>
+  </div>
+  <div class="bal" id="bal"><span>AVAILABLE BALANCE</span><b>&#8377;0.00</b></div>
+  <div class="h2">&gt;&gt; MARKETPLACE / USER STOCK</div>
+  <div class="tools" id="tools"><input id="q" type="search" placeholder="Search file..."></div>
+  <div class="grid" id="g"></div>
+
+  <div class="about">
+    <h3>ABOUT ADMIN SHOP</h3>
+    <p>Admin Shop ek simple aur bharosemand marketplace hai, jahan Free Fire, PUBG, Minecraft, Valorant, Roblox, GTA V aur Steam ki files aur keys ek hi jagah milti hain. Hamari koshish hai ki aapko sahi plan, saaf price aur seedhi baat mile.</p>
+    <ul>
+      <li>Saaf price: har plan ka rate pehle se dikhta hai, 1 ghante se 30 din tak.</li>
+      <li>Aasaan payment: UPI se pay karein, QR scan karein ya UPI ID copy kar lein.</li>
+      <li>Kharidne se pehle update file aur video / feedback ke baare mein Telegram par pooch sakte hain.</li>
+      <li>Payment ke baad screenshot bhejein, aapki key jaldi di jaati hai.</li>
+      <li>Koi bhi sawaal ho to Telegram @RAJIBXYT par seedha message karein.</li>
+    </ul>
+    <p>Admin Shop chunne ke liye shukriya. Aapka bharosa hamare liye sabse zaroori hai.</p>
+    <div class="ft2">&#9889; SECURE ADMIN PANEL &#9889;<small>ALL RIGHTS RESERVED</small></div>
+  </div>
+</div>
+
+<a class="tg" id="tg" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24"><path d="M21 3 3 10.5l6 2.2L11.5 20l3-4.5 4.5 3.5z"/><path d="M9 12.7 21 3"/></svg></a>
+
+<div id="m"><div class="mb">
+  <h3>Purchase Key</h3>
+  <div class="qr" id="qr"></div>
+  <div class="upi"><span id="upi"></span><button onclick="cp()">COPY</button></div>
+  <a id="pay" style="background:#1fa855;color:#fff;margin-bottom:6px">UPI app se pay karein</a>
+  <p id="mt">Payment karke screenshot Telegram par bhejein, key turant mil jayegi.</p>
+  <a id="tg2" target="_blank" rel="noopener">Telegram par bhejein</a>
+  <button class="x" onclick="closeM()">Close</button>
+</div></div>
+
+<script>
+// ===== Apni details yahan badlein =====
+var UPI_ID = "mahibxconfig@fam";
+var QR_IMAGE = "";             // QR image ka data URL ya link (khali = placeholder)
+var TG_USER = "RAJIBXYT";
+// ======================================
+var TG_URL = "https://t.me/" + TG_USER;
+document.getElementById("tg").href = TG_URL;
+document.getElementById("tg2").href = TG_URL;
+document.getElementById("upi").textContent = UPI_ID;
+function setQR(amt){
+var UPI_LINK = "upi://pay?pa=" + UPI_ID + "&pn=Admin%20Shop&cu=INR" + (amt ? "&am=" + amt.toFixed(2) : "");
+document.getElementById("pay").href = UPI_LINK;
+(function(){
+  var qr = document.getElementById("qr"); qr.innerHTML = "";
+  if (QR_IMAGE) { var im = document.createElement("img"); im.src = QR_IMAGE; im.alt = "QR"; qr.appendChild(im); return; }
+  try { new QRCode(qr, { text: UPI_LINK, width: 136, height: 136, correctLevel: QRCode.CorrectLevel.M }); }
+  catch (err) { qr.textContent = UPI_ID; }
+})();
+
+}
+setQR(0);
+
+// Security screen
+(function(){
+  var p = 0, pb = document.getElementById("pb"), st = document.getElementById("st");
+  var msgs = ["Initializing secure link...", "Verifying connection...", "Access granted..."];
+  var t = setInterval(function(){
+    p += 4 + Math.random() * 6;
+    if (p >= 100) { p = 100; clearInterval(t); setTimeout(function(){ document.getElementById("sec").classList.add("out"); }, 300); }
+    pb.style.width = p + "%";
+    st.textContent = msgs[p < 45 ? 0 : p < 90 ? 1 : 2];
+  }, 120);
+})();
+
+// Products
+var first = ["iGNITE file", "Apex prime", "BR Mood", "xyz file", "prime Hook", "Darksh fale"];
+var pre = ["Nova","Ghost","Titan","Venom","Alpha","Zero","Shadow","Blaze","Storm","Viper","Pixel"];
+var suf = ["Panel","Lite","Pro","Hook"];
+var games = ["FREEFIRE","PUBG","MINECRAFT","VALORANT","ROBLOX","GTA V","STEAM"];
+var feats = ["AIMBOT ADD","AUTO REVIVE","TP MARK","GLOW ROTATION","FIX MOCO ESP","FIX BLACKLIST","FIX LOGIN BUG"];
+var plans = [["1 Hours",22.5],["3 Hours",31.5],["6 Hours",45],["12 Hours",67.5],["1 DaYs",135],["3 DaYs",270],["7 DaYs",342],["30 DaYs",800]];
+var items = [];
+for (var i = 0; i < 50; i++) {
+  var n = i < 6 ? first[i] : pre[(i - 6) % 11] + " " + suf[Math.floor((i - 6) / 11)];
+  items.push({ n: n, g: games[i % games.length], h: (i * 47) % 360, t: i % 2 ? "NONROOT" : "ROOT + NONROOT" });
+}
+var cur = "ALL", g = document.getElementById("g"), tools = document.getElementById("tools");
+["ALL"].concat(games).forEach(function(x){
+  var b = document.createElement("button");
+  b.className = "chip" + (x === "ALL" ? " on" : ""); b.textContent = x;
+  b.onclick = function(){ cur = x; [].forEach.call(tools.querySelectorAll(".chip"), function(c){ c.classList.toggle("on", c === b); }); draw(); };
+  tools.appendChild(b);
+});
+document.getElementById("q").oninput = draw;
+
+function draw(){
+  var s = document.getElementById("q").value.toLowerCase(), out = "";
+  items.forEach(function(it, i){
+    if ((cur !== "ALL" && it.g !== cur) || it.n.toLowerCase().indexOf(s) < 0) return;
+    var bg = "linear-gradient(135deg,hsl(" + it.h + ",55%,22%),hsl(" + ((it.h + 60) % 360) + ",60%,10%)),radial-gradient(circle at 70% 40%,rgba(255,200,120,.35),transparent 55%)";
+    out += '<div class="card"><div class="th" style="background:' + bg + '" onclick="openM(\'Video / feedback dekhne ke liye Telegram par contact karein.\')">' +
+      '<span class="tag l">' + it.t + '</span><span class="tag r">' + it.g + '</span>' +
+      '<div class="play">&#9654;</div><div class="hud"><span>HP 200/200</span><span>#' + (i + 1) + '</span></div></div>' +
+      '<div class="body"><div class="nm">' + it.n + '</div>' +
+      feats.slice(0, 4).map(function(f){ return '<div class="ft"><span>&#9889;</span><b>&#9989;</b>' + f + '</div>'; }).join("") +
+      '<div class="more">' + feats.slice(4).map(function(f){ return '<div class="ft"><span>&#9889;</span><b>&#9989;</b>' + f + '</div>'; }).join("") + '</div>' +
+      
+      '<div style="text-align:center"><button class="chev" onclick="tg(this)" aria-label="More">&#8964;</button></div>' +
+      '<div class="row"><button class="b c" onclick="openM(\'Update file ke liye Telegram par contact karein.\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 20h14"/></svg>CHECK UPDATE FILE</button><button class="b r" onclick="openM(\'Video / feedback dekhne ke liye Telegram par contact karein.\')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>CHECK VIDEO / FEEDBACK</button></div>' +
+      '<button class="buy" onclick="pk(this)">PURCHASE KEY</button>' +
+      '<div class="plans">' + plans.map(function(p, k){ return '<div class="pl"><div><div class="pd">' + p[0] + '</div><div class="pp">&#8377;' + p[1].toFixed(2) + '</div></div><input class="qt" type="number" min="1" max="99" value="1" inputmode="numeric" aria-label="Quantity"><button class="bx" onclick="buy(this,' + i + ',' + k + ')">BUY</button></div>'; }).join("") + '</div></div></div>';
+  });
+  g.innerHTML = out || '<div class="none">Koi file nahi mili</div>';
+}
+function tg(b){ b.classList.toggle("open"); b.parentNode.previousElementSibling.classList.toggle("open"); }
+function openM(t, amt){ document.getElementById("mt").textContent = t; setQR(amt || 0); document.getElementById("m").classList.add("show"); }
+function pk(b){ b.nextElementSibling.classList.toggle("open"); }
+function buy(b, i, k){
+  var q = Math.max(1, Math.min(99, parseInt(b.previousElementSibling.value, 10) || 1)), tot = plans[k][1] * q;
+  openM(items[i].n + " - " + plans[k][0] + " x" + q + " = ₹" + tot.toFixed(2) + ". Payment karke screenshot Telegram par bhejein, key turant mil jayegi.", tot);
+}
+function closeM(){ document.getElementById("m").classList.remove("show"); }
+document.getElementById("m").onclick = function(e){ if (e.target === this) closeM(); };
+function cp(){ try { navigator.clipboard.writeText(UPI_ID); } catch (e) {} }
+draw();
+
+// Background: blue 3s, black 2s, repeat
+(function(){
+  var on = false;
+  function t(){ on = !on; document.body.style.backgroundColor = on ? "#0a35c8" : "#000"; setTimeout(t, on ? 3000 : 2000); }
+  t();
+})();
+
+// Available balance light: colour changes every 2.5s
+(function(){
+  var cols = ["#00f0ff", "#ff2a2a", "#7b6cf6", "#22e07a", "#ffd23f", "#ff4fd8"], i = 0, el = document.getElementById("bal");
+  setInterval(function(){ i = (i + 1) % cols.length; el.style.setProperty("--lc", cols[i]); }, 2500);
+})();
+</script>
+</body>
+</html>
